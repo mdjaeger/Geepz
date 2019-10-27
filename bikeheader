@@ -1,0 +1,172 @@
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
+#ifndef _bikes_h_
+#define _bikes_h_
+
+//#include "Shop_Com.h"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <list>
+#include <iomanip> 
+#include <memory>
+#include <iterator> 
+
+using namespace std;
+
+enum status { NO_STATUS, NOT_RENTED, RENTED, ALL };
+enum order { NO_ORDER, ID, MANUF };
+
+struct Bike {
+
+	char manufact[25];
+	int id_num;
+	status rented_code;//RENTED/NOT_RENTED
+	char to_whom[25];   //to whom bike is rented
+	int size;
+	float cost_per_day;
+	int day_rented;
+	bool deleted;//to mark bike as deleted in the list.
+	Bike* head;//beginig of the list
+	Bike* tail;//last node of the list 
+	Bike* curr;//current position in the list
+	Bike* head_manuf;//beginig of the list
+	Bike* tail_manuf;//last node of the list 
+	Bike* curr_manuf;//current position in the list
+	Bike* head_id;//beginig of the list
+	Bike* tail_id;//last node of the list 
+	Bike* curr_id;//current position in the list
+	Bike* next_manuf;//pointer to next node in the//manufacturers list
+	Bike* next_id;//pointer to the next node//in the list by ID
+	Bike* next;//pointer to the next node in the general list};
+};
+
+
+void readBike(fstream&, Bike*& head, Bike*& manuf, Bike*& id);
+//Gets passed the inputFile and grabs the data to create a new bike object.
+
+
+Bike* addBike(Bike* head, Bike* new_bike);
+/**************addBike:
+-*Purpose: adds bike to the general list
+*Parameters: pointer to the first node in the list, pointer to the new node
+*Returns pointer to the first node in the list.
+*This function is overloaded with two other functions below*/
+
+
+Bike* addBike(Bike* head_id, Bike* new_bike, order);
+/**************addBike:- (optional)
+*Purpose: Overloaded function to add bike to the list, ordered by ID.
+*Note, that you have only one set of nodes. You will need to implement different
+*lists by different sets of pointers.*  + 5 extra points.
+*/
+
+
+Bike* addBike(Bike* head_manufacturer, Bike* new_bike, order, int);
+/**************addBike:- (optional)
+*Purpose: Overloaded function to add bike to the list, ordered by manufacturer.
+*Note, that you have only one set of nodes. You will need to implement different
+*lists by different sets of pointers.*
+*/
+
+
+void printBikes(Bike*, order, status);
+/***************printBike:-
+*Purpose: Prints any list of bikes with partiel detals, depending on the
+*order, and the head pointer passed. Note, that depending on the list, your pointer assignments should be different.
+*/
+
+
+void printBikesFull(Bike* headPtr, order currOrder, status currStatus);
+/***************printBikeFull:-
+*Purpose: Prints any list of bikes with full details, depending on the
+*order, and the head pointer passed. Note, that depending on the list, your pointer assignments should be different.
+*The last part is not applicable if you chose not to implement ordered lists*Parameters:
+*Bike* - pointer to the first node of the list of bikes.*order - needed to control pointer re-assignment. I.e. if order == ID,
+*you should move along the list, ordered by ID.*status - Determines which bikes to print from the list. I.e. rented, not *rented, or all.*/
+
+
+void printBikesOnStatus(Bike* headPtr, status currStatus);
+/***************printBike:-
+*Purpose: Prints any list of bikes, that have not been deleted, depending on the
+*status, and the head pointer passed. If status is RENTED, you print only bikes
+*that are rented. If status is ALL, you print the entire list of (not deleted)
+*bikes. Note, that depending on the list, your pointer assignments should be different.
+*The last part is not applicable if you chose not to implement ordered lists*Parameters:
+*Bike* - pointer to the first node of the list of bikes.*order - needed to control pointer re-assignment. I.e. if order == ID,
+*you should move along the list, ordered by ID.*status - Determines which bikes to print from the list. I.e. rented, not *rented, or all.*/
+
+
+bool comp_manfuc(Bike * b1, Bike * b2);
+
+bool comp_id(Bike * b1, Bike * b2);
+
+void do_transact(fstream&, Bike*, status);
+/*******************do_transact:-
+									  *Purpose: Reads the ID, number of days from the file, and depending on the status
+									  *(RENTED/NOT_RENTED) either rents bike to the person (in which case you need to
+									  * read person's name from the file, or performs return transaction. If transaction
+									  *is rented, you should also display the total cost of the rent
+									  *(number of days * cost of rent per day).
+									  *in both cases, if status of bike does not correspond to the type of the
+									  * transaction (i.e. you try to rent the bike which status is RENTED), you need to
+									  * output an appropriate message and return.*/
+
+
+void shop_rentout(fstream& inputFile, Bike* headPtr);
+/*
+* shop_rentout() function this will read the bike id and
+* and checks for whether the bike can be rented or not. If so then will try to rent out the bike to the given person.
+*/
+
+
+void shop_return(fstream& inputFile, Bike* headPtr);
+/*
+* shop_return() function this will read the bike id and
+* and checks for whether the bike is rented or not. If rented, then
+* set the status to not rented and returns the bike object.
+*/
+
+
+void del_id_bike(fstream&, Bike*);
+/*************************del_id_bike:-
+										   *Purpose: Finds the bike by the ID in the list and sets its deleted flag to true.
+										   *Note, that you do not delete the node. You set its deleted flag to true.
+										   *Parameters: *fstream object to the file to read the bike's ID
+										   *pointer to the head of the bike's list ordered by ID. If you did not implement
+										   *the ordered list, use a pointer to the head of the general list.*/
+
+
+void del_manuf(fstream&, Bike*);
+/*************************del_manuf:-
+									*Purpose: Finds the bike by the manufacturer's name in the list and sets its
+									*deleted flag to true.
+									*Parameters: as above.*/
+
+
+void deleteBikes(Bike*);
+/**************************deleteBikes:-
+								 *Purpose: To traverse the general list of bikes and delete all the nodes in
+								 *it, thus releasing back all the memory used.
+								 *It is called before your program exits.
+								 *Note, that if you implemented any dynamically allocated memory in the node,
+								 *you will need to release that memory first, before deleting the node itself.
+								 *Parameters:*pointer to the head of the general list of bikes. */
+
+
+void init(Bike*);
+/**********************init:-
+						 *Purpose: This function initializes the new Bike's object to all default values
+						 *(char array should be initialized to ""*/
+
+
+
+#endif/* _BIKES_H_*/
+// TODO: add headers that you want to pre-compile here

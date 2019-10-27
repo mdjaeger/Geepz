@@ -1,0 +1,144 @@
+
+
+#define _CRT_SECURE_NO_WARNINGS
+#include "_bikes_h_.h"
+//#include "Shop_Com.h"
+
+#include <iostream>
+#include <string>
+#include <list>
+#include <stdio.h>
+#include <cstring>
+#include <math.h>
+#include <stdlib.h>
+#include <ctype.h>          
+#include <stdio.h> 
+#include <cstdlib>
+#include <fstream>
+#include <memory>
+#include <iterator> 
+
+using namespace std;
+using std::string;
+
+/*
+Programmer: Freddie TadeoLomelin ID:011821470
+Purpose: Bike_Shop keeping: takes an txt.file for data and a list of commands to peform serval actions. includes bike strucute, linked list + pointers
+Class: CS222
+Assignment number 6.
+*/
+
+int main()
+{
+
+	//--OPEN FILES< OUTPUT/DATA FILE----
+	fstream fileOut;
+	fileOut.open("prog_6_dat_file.txt");
+	if (!fileOut)
+	{
+		std::cout << "prog_6_dat_file.txt could not be opened for output.\n";
+		return EXIT_FAILURE;
+	}//opening input/outpu files, w/th warnings
+	ofstream file;
+	file.open("csis.txt");
+	if (!file)
+	{
+		std::cout << "csis.txt could not be opened for output.\n";
+		return EXIT_FAILURE;
+	}
+
+	list <Bike> bikeList1;
+	Bike* head = NULL;
+	//Bike* start_id = head;
+	//Bike* start_manfu = head;
+
+	int txtCode;
+
+
+	std::cout << "Data loaded, and varibles set.\n";
+	file << "Data loaded, and varibles set.\n";
+
+	//read data and enter the do-while, loop + switch stament to travsre the txt.file.
+	do
+	{
+		fileOut >> txtCode;
+		switch (txtCode)
+		{
+			//Bike function calls for each command number, should get the data needed from the next lines of data.txt (10 different commands)\
+
+		case 1:// create an bike object from the data read from Txt-file, and then after add this bike into the 3 different list}
+			readBike(fileOut, &bikeList1);
+			break;
+			//Will need the data from the txt.file so should read the next (4) lines for parameters. so tire size and rent-cost is stored too.
+
+		case 2:// print the genral list of bike objects, loop through whole list till fall off}
+			cout << "Printing whole list of bikes" << endl;
+			file << "Printing whole list of bikes" << endl;
+			printBikes(head, NO_ORDER, ALL);
+			//file << printBikes(head, NO_ORDER, ALL);
+			break;
+
+		case 3:// simlar to 2, print the order list by ID, refer to sorting and train project}
+			cout << "Printing whole list of bikes, by ID #" << endl;
+			file << "Printing whole list of bikes, by ID #" << endl;
+			printBikes(start_id, ID, ALL);
+			//file << printBikes(start_id, ID, ALL);
+			break;
+
+		case 4:// simlar to 2, print the order list by manufacturer,  refer to sorting and train project}
+			cout << "Printing whole list of bikes, by manufacturer" << endl;
+			file << "Printing whole list of bikes, by manufacturer" << endl;
+			printBikes(start_manfu, MANUF, ALL);
+			//file << printBikes(start_manfu, MANUF, ALL);
+			break;
+
+		case 5://print list of avaible bikes for rent,  check if do_transact for status? + loop through genral list to
+			//*status check when the function is called to determind if to print what bike is avaible
+			cout << "Printing list of bikes, avaible for rent" << endl;
+			file << "Printing list of bikes, avaible for rent" << endl;
+			printBikesFull(head, NO_ORDER, NOT_RENTED);
+			//file << printBikesFull(head, NO_ORDER, NOT_RENTED);
+			break;
+
+		case 6:// print list of rented bikes, use a do_transact check? + loop through genral list to
+			//*status check when the function is called to determind if to print what bike is avaible
+			cout << "Printing list of bikes, rented out" << endl;
+			file << "Printing list of bikes, rented out" << endl;
+			printBikesFull(head, NO_ORDER, RENTED);
+			//file << printBikesFull(head, NO_ORDER, RENTED);
+			break;
+
+		case 7:// Rental transaction - do_transact,  read from data file}
+			do_transact(fileOut, head, RENTED);
+			break;
+
+		case 8:// Return transcation - related to do_transact, and read from data file}
+			do_transact(fileOut, head, NOT_RENTED);
+			break;
+
+		case 9:// "Soft" delete by bike ID, read from data file}
+			del_id_bike(fileOut, head);
+			break;
+
+		case 10:// - Delete bike by manufactor, read from data file
+			del_manuf(fileOut, head);
+			break;
+
+			//Break statment if runs across non-command data-line, so would skip over that to the next line with an command (1-10).
+		default:
+			//Output an error, something's wrong 
+			cout << "Error, something's wrong" << endl;
+			file << "Error, something's wrong" << endl;
+			break;
+
+		}
+	} while (fileOut);//end of processing given data
+
+
+	file.close();;//close output.txt file
+	fileOut.close();//close output.txt file
+	deleteBikes(head); // delete bikes from memory
+	getchar();
+
+	return 0;
+}

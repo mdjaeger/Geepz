@@ -1,0 +1,483 @@
+// pch.cpp: source file corresponding to pre-compiled header; necessary for compilation to succeed
+
+
+
+#include "_bikes_h_.h"
+
+
+
+void readBike(fstream& inputFile, Bike*& head, Bike*& manuf, Bike*& id)
+{
+	Bike* newNode = new Bike;
+	//grabbing the data from txt.file
+	init(newNode);
+	inputFile >> newNode->id_num;
+	inputFile >> newNode->size;
+	inputFile >> newNode->cost_per_day;
+	inputFile >> newNode->manufact;
+
+	//adding to the right list
+	head = addBike(head, newNode);
+	id = addBike(id, newNode, ID);
+	manuf = addBike(manuf, newNode, MANUF, 0);
+
+	/*
+	char c = in.get();
+
+	while (in.good()) {
+		std::cout << c;
+		c = in.get();
+
+	}
+	*/
+}
+//Gets passed the inputFile and grabs the data to create a new bike object.
+
+
+Bike* addBike(Bike* head, Bike* newNode)
+{
+	// set newNode's next pointer to the header node
+	newNode->next = head;
+
+	// set the pointer of the newNode to head pointer
+	head = newNode;
+
+	// return the updated head pointer
+	return head;
+}
+/**************addBike:
+-*Purpose: adds bike to the general list
+*Parameters: pointer to the first node in the list, pointer to the new node
+*Returns pointer to the first node in the list.
+*This function is overloaded with two other functions below*/
+
+
+Bike* addBike(Bike* head_id, Bike* tempNode, order)
+{
+	// set the head_id pointer to newNode
+	Bike* newNode = head_id;
+
+	// check if the head_id is null or head_id value is greater than the new-bike id
+	if (head_id == NULL || head_id->id_num >= tempNode->id_num)
+	{
+		tempNode->next_id = head_id;
+		head_id = tempNode;
+	}
+	else
+	{
+		// set the head_id to newNode
+		newNode = head_id;
+
+		while (newNode->next_id != NULL)
+		{
+			if (newNode->id_num > tempNode->id_num)
+				break;
+			newNode = newNode->next_id;
+		}
+
+		tempNode->next_id = newNode->next_id;
+		newNode->next_id = tempNode;
+	}
+
+	return head_id;
+}
+/**************addBike:- (optional)
+*Purpose: Overloaded function to add bike to the list, ordered by ID.
+*Note, that you have only one set of nodes. You will need to implement different
+*lists by different sets of pointers.*
+*/
+
+
+Bike* addBike(Bike* head_manufacturer, Bike* tempNode, order, int)
+{
+	// set the head of the manufacturer node to the newNode
+	Bike* newNode = head_manufacturer;
+
+	// if the head_maufacturer is null or the the name of the manufacturer of newNode 
+	// comes before the head_manufacturer name then add the newNode to the starting of the linked list
+	if (head_manufacturer == NULL || strcmp(tempNode->manufact, head_manufacturer->manufact) <= 0)
+	{
+		tempNode->next_manuf = head_manufacturer;
+		head_manufacturer = tempNode;
+	}
+	else
+	{
+		// set the head_manufacturer to the newNode
+		newNode = head_manufacturer;
+
+		// loop until either the newNode falls off or the manufacturer
+		// name in the newNode comes after the newNode manufacturer name
+		while (newNode->next_manuf != NULL &&
+			strcmp(tempNode->manufact, newNode->manufact) >= 0)
+		{
+			newNode = newNode->next_manuf;
+		}
+		tempNode->next_manuf = newNode->next_manuf;
+		newNode->next_manuf = tempNode;
+	}
+
+	// return the head_manufacturer node
+	return head_manufacturer;
+}
+/**************addBike:- (optional)
+*Purpose: Overloaded function to add bike to the list, ordered by manufacturer.
+*Note, that you have only one set of nodes. You will need to implement different
+*lists by different sets of pointers.*
+*/
+
+
+
+void printBikesOnStatus(Bike* headPtr, status currStatus)
+{
+	// setting tempNode with the headPtr
+	Bike* tempNode = headPtr;
+
+	if (tempNode->deleted == false)
+	{
+		// condition to check whether the rented_code is RENTED
+		if (tempNode->rented_code == currStatus)
+		{
+			// to print a single bike information
+			cout << setw(10) << left << tempNode->id_num << setw(15) << left << tempNode->manufact;
+			cout << setw(15) << left << tempNode->rented_code << setw(15) << left;
+			cout << tempNode->to_whom << setw(10) << left;
+			cout << tempNode->size << setw(5) << left << tempNode->cost_per_day << endl;
+		}
+		// condition to check whether the rented_code is NOT_RENTED
+		else if (tempNode->rented_code == currStatus)
+		{
+			cout << setw(10) << left << tempNode->id_num << setw(15) << left << tempNode->manufact;
+			cout << setw(15) << left << tempNode->rented_code << setw(15) << left;
+			cout << " - " << setw(10) << left;
+			cout << tempNode->size << setw(5) << left << tempNode->cost_per_day << endl;
+		}
+
+		// condition to check whether the rented_code is RENTED
+		else if (currStatus == NO_STATUS || currStatus == ALL)
+		{
+			//This also display only partial information about the bikes 
+			cout << setw(10) << left << tempNode->id_num << setw(15) << left << tempNode->manufact;
+			cout << setw(15) << left << tempNode->cost_per_day << setw(5) << left << tempNode->size << endl;
+		}
+	}
+}
+/***************printBikesOnStatus:-
+*Purpose: Prints any list of bikes, that have not been deleted, depending on the
+*status, and the head pointer passed. If status is RENTED, you print only bikes
+*that are rented. If status is ALL, you print the entire list of (not deleted)
+*bikes. Note, that depending on the list, your pointer assignments should be different.
+*The last part is not applicable if you chose not to implement ordered lists*Parameters:
+*Bike* - pointer to the first node of the list of bikes.*order - needed to control pointer re-assignment. I.e. if order == ID,
+*you should move along the list, ordered by ID.*status - Determines which bikes to print from the list. I.e. rented, not *rented, or all.*/
+
+
+void printBikesFull(Bike* headPtr, order currOrder, status currStatus)
+{
+	// set the headPtr to the tempNode
+	Bike* tempNode = headPtr;
+
+	//display headers
+	cout << setw(10) << left << "BIKE_ID" << setw(15) << left << "MANUFACTURER";
+	cout << setw(15) << left << "RENT_STATUS" << setw(15) << left << "RENTED_TO" << setw(10) << left << "SIZE" << setw(5) << left << "COST_PER_DAY" << left << endl;
+
+	// loop until the tempNode is it falls off the list
+	while (tempNode != NULL)
+	{
+		// use a switch statment to call the right function
+		switch (currOrder)
+		{
+			// if currOder is a no_order then pass the (next) pointer
+		case NO_ORDER:
+			printBikesOnStatus(tempNode, currStatus);
+			// move the pointer to the next
+			tempNode = tempNode->next;
+			break;
+
+			// if currOder is a ID then pass the (next_id) pointer
+		case ID:
+			printBikesOnStatus(tempNode, currStatus);
+			tempNode = tempNode->next_id;
+			break;
+
+			// if currOder is a MANUF then pass the (next_manuf) pointer
+		case MANUF:
+			printBikesOnStatus(tempNode, currStatus);
+			tempNode = tempNode->next_manuf;
+			break;
+		}
+	}
+	cout << endl;
+}
+/***************printBikeFull:-
+*Purpose: Prints any list of bikes with full details, depending on the
+*order, and the head pointer passed. Note, that depending on the list, your pointer assignments should be different.
+*The last part is not applicable if you chose not to implement ordered lists*Parameters:
+*Bike* - pointer to the first node of the list of bikes.*order - needed to control pointer re-assignment. I.e. if order == ID,
+*you should move along the list, ordered by ID.*status - Determines which bikes to print from the list. I.e. rented, not *rented, or all.*/
+
+
+void printBikes(Bike* headPtr, order currOrder, status currStatus)
+{
+	// set the headPtr to the tempNode
+	Bike* tempNode = headPtr;
+
+	//display headers
+	cout << setw(10) << left << "BIKE_ID" << setw(15) << left << "MANUFACTURER";
+	cout << setw(15) << left << "COST_PER_DAY" << setw(5) << left << "SIZE" << left << endl;
+
+	// loop until the tempNode falls off the linked list
+	while (tempNode != NULL)
+	{
+		// use a switch statement to call the corrent function
+		switch (currOrder)
+		{
+			// if currOder is a no_order then pass the (next) pointer
+		case NO_ORDER:
+			printBikesOnStatus(tempNode, currStatus);
+			tempNode = tempNode->next;
+			break;
+
+			// if currOder is a ID then pass the (next_id) pointer
+		case ID:
+			printBikesOnStatus(tempNode, currStatus);
+			tempNode = tempNode->next_id;
+			break;
+
+			// if currOder is a MANUF then pass the (next_manuf) pointer
+		case MANUF:
+			printBikesOnStatus(tempNode, currStatus);
+			tempNode = tempNode->next_manuf;
+			break;
+		}
+	}
+	cout << endl;
+}
+/***************printBike:-
+*Purpose: Prints any list of bikes with partiel detals, depending on the
+*order, and the head pointer passed. Note, that depending on the list, your pointer assignments should be different.
+*/
+
+bool comp_id(Bike * b1, Bike * b2) 
+{
+	return b1->id_num < b2->id_num; 
+}
+
+bool comp_manfuc(Bike * b1, Bike * b2) 
+{
+	return b1->manufact < b2->manufact;
+}
+
+
+void shop_rentout(fstream& inputFile, Bike* headPtr)
+{
+	// set the headPtr to the tempNode
+	Bike* tempNode = headPtr;
+
+	// setting the variables
+	int bikeID;
+	int numDays;
+	char rentedTo[50];
+
+	// get the bikeID
+	inputFile >> bikeID;
+	// get the number of day requested for rental
+	inputFile >> numDays;
+	// get the name to whom it is being rented
+	inputFile.getline(rentedTo, 50);
+	inputFile.getline(rentedTo, 50);
+
+	// loop through each value in the list and check for the id matach.
+	// If the pointer falls off the list or the id is matched, then break the loop
+	while ((bikeID != tempNode->id_num) && (tempNode->next != NULL))
+	{
+		tempNode = tempNode->next;
+	}
+
+	// now check for the whether the bike can be rented
+	if (tempNode != NULL && (tempNode->deleted) == false)
+	{
+		//update the bikes infomation / the transaction
+		int size = tempNode->size;
+		strcpy_s(tempNode->to_whom, 30, rentedTo);
+		tempNode->rented_code = RENTED;
+		// display the details of rental
+		cout << "\nBIKE ID RENTED: " << bikeID << endl;
+		cout << "RENTED TO: " << rentedTo << endl;
+		cout << "NUMBER OF DAYS: " << numDays << endl;
+		cout << "TOTAL COST: $" << ((tempNode->cost_per_day) * (numDays)) << "\n" << endl;
+		tempNode->size = size;
+	}
+	else
+	{
+		cout << "Bike ID is not found. Please try later." << endl;
+		return;
+	}
+}
+/*
+* shop_rentout() function this will read the bike id and
+* and checks for whether the bike can be rented or not. If so then will try to rent out the bike to the given person.
+*/
+
+
+void shop_return(fstream& inputFile, Bike* headPtr)
+{
+	// seting the headPtr to the tempNode
+	Bike* tempNode = headPtr;
+
+	// set the needed variables
+	int bikeID;
+
+	// get the bikeID
+	inputFile >> bikeID;
+
+	// loop through each value in the list and check for the id matach. 
+	//If the pointer falls off or the id is matched, then break the loop
+	while ((bikeID != tempNode->id_num) && (tempNode))
+	{
+		tempNode = tempNode->next;
+	}
+
+	// now check for the whether the bike flag is not deleted and tempNode is not null,
+	//then update the bike information and display it
+	if (tempNode)
+	{
+		// if the bike id matches then update the node's bike status
+		if ((tempNode->id_num == bikeID) && (tempNode->rented_code == RENTED))
+		{
+			int size = tempNode->size;
+			tempNode->rented_code = NOT_RENTED;
+			strcpy_s(tempNode->to_whom, 30, " - ");
+			tempNode->size = size;
+			cout << "The bike is returned successfully.\n";
+		}
+		else
+		{
+			cout << "Bike ID is not rented." << endl;
+		}
+	}
+	else
+	{
+		cout << "Bike ID is not found. Please try later." << endl;
+	}
+}
+/*
+* shop_return() function this will read the bike id and
+* and checks for whether the bike is rented or not. If rented, then
+* set the status to not rented and returns the bike object.
+*/
+
+
+void do_transact(fstream& inputFile, Bike* headPtr, status currRentStatus)
+{
+	//switch statement depending on the bike rental status
+	switch (currRentStatus)
+	{
+	case RENTED:
+		shop_rentout(inputFile, headPtr);
+		break;
+
+	case NOT_RENTED:
+		shop_return(inputFile, headPtr);
+		break;
+	default:
+		cout << "Sorry! Unable to preform the transaction\n";
+	}
+}
+/*******************do_transact:-
+									  *Purpose: Reads the ID, number of days from the file, and depending on the status
+									  *(RENTED/NOT_RENTED) either rents bike to the person (in which case you need to
+									  * read person's name from the file, or performs return transaction. If transaction
+									  *is rented, you should also display the total cost of the rent
+									  *(number of days * cost of rent per day).
+									  *in both cases, if status of bike does not correspond to the type of the
+									  * transaction (i.e. you try to rent the bike which status is RENTED), you need to
+									  * output an appropriate message and return.*/
+
+
+void del_id_bike(fstream& inputFile, Bike* bikeID)
+{
+	//soft delete.
+	int id;
+	inputFile >> id;//get from input file
+	Bike* tempNode = bikeID;
+	while (tempNode->next != NULL)//tranvesre list until pointer falls off
+	{
+		if (tempNode->id_num == id)
+			tempNode->deleted = true;//flips flag from false to true
+		tempNode = tempNode->next;
+	}
+	cout << "H/D" << endl;
+}
+/*************************del_id_bike:-
+										   *Purpose: Finds the bike by the ID in the list and sets its deleted flag to true.
+										   *Note, that you do not delete the node. You set its deleted flag to true.
+										   *Parameters: *fstream object to the file to read the bike's ID
+										   *pointer to the head of the bike's list ordered by ID. If you did not implement
+										   *the ordered list, use a pointer to the head of the general list.*/
+
+
+void del_manuf(fstream& inputFile, Bike* bikeManufacturer)
+{
+	//get manufacturer name from inputfile
+	char manuFactName[30];
+	inputFile.getline(manuFactName, 30);
+	inputFile.getline(manuFactName, 30);
+
+	Bike* tempNode = bikeManufacturer;
+	while (tempNode != NULL)//tranvesre list until pointer falls off
+	{
+		if (strcmp(tempNode->manufact, manuFactName) == 0)//checks for match
+		{
+			cout << "Successful deletion." << endl;
+			tempNode->deleted = true;
+		}
+		tempNode = tempNode->next;
+	}
+}
+/*************************del_manuf:-
+									*Purpose: Finds the bike by the manufacturer's name in the list and sets its
+									*deleted flag to true.
+									*Parameters: as above.*/
+
+
+void deleteBikes(Bike* bikeNodePtr)
+{
+	//set the given bike node passed to currNode
+	Bike* currNode = bikeNodePtr;
+	Bike* previous;// to grab the node before the current node
+	while (currNode != NULL)//tranverse linked list
+	{
+		previous = currNode;
+		currNode = currNode->next;
+		delete previous;//delete the node that was broken off
+	}
+	cout << "Successful clear." << endl;
+	delete currNode;
+}
+/**************************deleteBikes:-
+								 *Purpose: To traverse the general list of bikes and delete all the nodes in
+								 *it, thus releasing back all the memory used.
+								 *It is called before your program exits.
+								 *Note, that if you implemented any dynamically allocated memory in the node,
+								 *you will need to release that memory first, before deleting the node itself.
+								 *Parameters:*pointer to the head of the general list of bikes. */
+
+
+void init(Bike* newBike)
+{
+	strcpy_s(newBike->manufact, sizeof(char), "");
+	newBike->id_num = 0;
+	newBike->rented_code = NOT_RENTED;
+	strcpy_s(newBike->to_whom, sizeof(char), "");
+	newBike->size = 0;
+	newBike->cost_per_day = 0.0;
+	newBike->deleted = false;
+	newBike->next = NULL;
+	newBike->next_id = NULL;
+	newBike->next_manuf = NULL;
+}
+/**********************init:-
+						 *Purpose: This function initializes the new Bike's object to all default values
+						 *(char array should be initialized to ""*/
+
+// In general, ignore this file, but keep it around if you are using pre-compiled headers.
